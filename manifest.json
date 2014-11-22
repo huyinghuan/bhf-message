@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+  "name": "bhf-message",
+  "short_name": "bhf-message",
+  "description": "Description for bhf-message",
+
+  "version": "0.0.1.0",
+  "permissions":[
+    "background",
+    "notifications"
+  ],
+  "icons": {
+    "16": "assets/icon_16.png",
+    "128": "assets/icon_128.png",
+    "19": "assets/icon_19.png"
+  },
+
+  "background": {
+    "page": "background.html"
+  },
+
+  "browser_action": {
+    "default_title": "BHF",
+    "default_icon": "assets/icon_19.png",
+    "default_popup": "popup.html"
+  }
+}
