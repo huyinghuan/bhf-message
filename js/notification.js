@@ -4,30 +4,91 @@
  */
 
 (function() {
-  var ChromeBrowser, Factory, FireFoxBrowser, Notification, SafariBrowser;
+  var BrowserAction, ChromeBrowser, Factory, FireFoxBrowser, Notification, SafariBrowser, utils;
 
-  if (!window.BHFService) {
-    window.BHFService = {};
-  }
+  utils = {};
+
+  BrowserAction = (function() {
+    function BrowserAction() {}
+
+    BrowserAction.prototype.close = function() {};
+
+    BrowserAction.prototype.click = function() {};
+
+    BrowserAction.prototype.save = function(key, value) {};
+
+    return BrowserAction;
+
+  })();
 
   ChromeBrowser = (function() {
     function ChromeBrowser() {
+      this.action = new BrowserAction();
       this.notification = chrome.notifications;
+      this.initEvent();
     }
 
-    ChromeBrowser.prototype.show = function(message) {
-      if (!this.isAllow()) {
-
+    ChromeBrowser.prototype.show = function(data) {
+      var options;
+      if (data == null) {
+        data = {};
       }
+      options = this.getOptions();
+      if (data.message) {
+        options.message = data.message;
+      }
+      if (data.title) {
+        options.title = data.title;
+      }
+      return this.notification.create('', options, function(nid) {});
     };
 
-    ChromeBrowser.prototype.isAllow = function() {
-      var permission;
-      permission = this.notification.PermissionLevel;
-      if (permission === 'granted') {
-        return true;
-      }
-      return false;
+    ChromeBrowser.prototype.getOptions = function() {
+      var setting;
+      return setting = {
+        type: "basic",
+        title: "BHF 消息",
+        message: 'Test Message',
+        iconUrl: "assets/icon_16.png",
+        buttons: [
+          {
+            title: '查看'
+          }, {
+            title: '忽略'
+          }
+        ]
+      };
+    };
+
+    ChromeBrowser.prototype.initEvent = function() {
+      var self;
+      self = this;
+      return this.notification.onButtonClicked.addListener(function(nid, index) {
+        if (index === 0) {
+          return self.click(nid);
+        } else {
+          return self.close(nid);
+        }
+      });
+    };
+
+    ChromeBrowser.prototype.close = function(nid) {
+      return this.notification.clear(nid, function() {});
+    };
+
+    ChromeBrowser.prototype.click = function(nid) {
+      console.log(nid);
+      return this.close(nid);
+    };
+
+    ChromeBrowser.prototype.isAllow = function(cb) {
+      return this.notification.getPermissionLevel(function(permission) {
+        if (permission === 'granted') {
+          return cb && cb(true);
+        } else {
+          return cb && cb(false);
+        }
+      });
     };
 
     return ChromeBrowser;
@@ -50,31 +111,18 @@
 
   Factory = (function() {
     function Factory() {
-      this.initFunctions();
+      this.utils = utils;
+      this.initBrowser();
     }
-
-    Factory.prototype.isChrome = function() {
-      if ((typeof chrome !== "undefined" && chrome !== null) && (chrome.extension != null)) {
-        return true;
-      }
-    };
-
-    Factory.prototype.isFireFox = function() {
-      return false;
-    };
-
-    Factory.prototype.isSafari = function() {
-      return false;
-    };
 
     Factory.prototype.initBrowser = function() {
       var browser;
-      browser = null;
-      if (this.isChrome()) {
+      browser = this.utils.getBrowser();
+      if (browser === this.utils.Browser.CHROME) {
         browser = new ChromeBrowser();
-      } else if (this.isFireFox()) {
+      } else if (browser === this.utils.Browser.FIREFOX) {
         browser = new FireFoxBrowser();
-      } else if (this.isSafari()) {
+      } else if (browser === this.utils.Browser.SAFARI) {
         browser = new SafariBrowser();
       }
       return this.browser = browser;
@@ -101,6 +149,9 @@
 
   })();
 
-  window.BHFService.notification = new Notification(new Factory());
+  if (window.BHFService) {
+    utils = window.BHFService.utils;
+    window.BHFService.notification = new Notification(new Factory());
+  }
 
 }).call(this);
