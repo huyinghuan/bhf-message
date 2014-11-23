@@ -20,7 +20,10 @@
 
     ChromeStorage.prototype.get = function(key, cb) {
       return this.storage.get(key, function(data) {
-        return cb && cb(data);
+        if (!data) {
+          data = {};
+        }
+        return cb && cb(data[key]);
       });
     };
 
