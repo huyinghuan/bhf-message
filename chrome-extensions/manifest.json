@@ -8,7 +8,8 @@
   "permissions":[
     "background",
     "notifications",
-    "storage"
+    "storage",
+    "http://localhost:3000/"
   ],
   "icons": {
     "16": "assets/icon_16.png",

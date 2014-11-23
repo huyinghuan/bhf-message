@@ -2,7 +2,9 @@
   测试socket.io的消息
 ###
 
-handler = (req, res) -> res.end ''
+handler = (req, res) ->
+  console.log(123)
+  res.end 'hello'
 
 app = require("http").createServer(handler)
 
