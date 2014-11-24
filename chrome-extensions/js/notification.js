@@ -4,31 +4,20 @@
  */
 
 (function() {
-  var BrowserAction, ChromeBrowser, Factory, FireFoxBrowser, Notification, SafariBrowser, utils;
+  var ChromeBrowser, Factory, FireFoxBrowser, Notification, SafariBrowser, storage, utils;
 
   utils = {};
 
-  BrowserAction = (function() {
-    function BrowserAction() {}
-
-    BrowserAction.prototype.close = function() {};
-
-    BrowserAction.prototype.click = function() {};
-
-    BrowserAction.prototype.save = function(key, value) {};
-
-    return BrowserAction;
-
-  })();
+  storage = {};
 
   ChromeBrowser = (function() {
     function ChromeBrowser() {
-      this.action = new BrowserAction();
       this.notification = chrome.notifications;
+      this.browserAction = chrome.browserAction;
       this.initEvent();
     }
 
-    ChromeBrowser.prototype.show = function(data) {
+    ChromeBrowser.prototype.show = function(data, cb) {
       var options;
       if (data == null) {
         data = {};
@@ -40,7 +29,12 @@
       if (data.title) {
         options.title = data.title;
       }
-      return this.notification.create('', options, function(nid) {});
+      this.notification.create('', options, function(nid) {
+        return cb && cb(nid);
+      });
+      return this.browserAction.setBadgeText({
+        text: "10+"
+      });
     };
 
     ChromeBrowser.prototype.getOptions = function() {
@@ -77,8 +71,11 @@
     };
 
     ChromeBrowser.prototype.click = function(nid) {
-      console.log(nid);
-      return this.close(nid);
+      var self;
+      self = this;
+      return storage.get(nid, function(data) {
+        return console.log('点击查看按钮的动作拉取数据', data);
+      });
     };
 
     ChromeBrowser.prototype.isAllow = function(cb) {
@@ -142,7 +139,11 @@
     }
 
     Notification.prototype.show = function(message) {
-      return this.browser.show(message);
+      return this.browser.show(message, function(nid) {
+        console.log('create nid', nid);
+        message.timestamp = new Date().getTime();
+        return storage.set(nid, message);
+      });
     };
 
     return Notification;
@@ -151,6 +152,7 @@
 
   if (window.BHFService) {
     utils = window.BHFService.utils;
+    storage = window.BHFService.storage;
     window.BHFService.notification = new Notification(new Factory());
   }
 

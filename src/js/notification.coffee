@@ -2,30 +2,25 @@
   封装 各个浏览器的消息提醒
 ###
 utils = {}
-#浏览器动作
-class BrowserAction
-  constructor: ->
-
-  close: ()->
-
-  click: ()->
-
-  save: (key, value)->
+storage = {}
 
 #chrome 浏览器的消息通知机制
 class ChromeBrowser
   constructor: ->
-    @action = new BrowserAction()
     @notification = chrome.notifications
+    @browserAction = chrome.browserAction
     @initEvent()
 
-  show: (data = {})->
+  show: (data = {}, cb)->
     options = @getOptions()
 
     options.message = data.message if data.message
     options.title = data.title if data.title
 
-    @notification.create '', options, (nid)->
+    @notification.create('', options, (nid)-> cb and cb(nid))
+
+    #设置浏览器上面的文字
+    @browserAction.setBadgeText({text: "10+"});
 
   getOptions: ->
     setting =
@@ -50,8 +45,11 @@ class ChromeBrowser
     @notification.clear(nid, ->)
 
   click: (nid)->
-    console.log nid
-    @close(nid)
+    self = @
+    storage.get(nid, (data)->
+      console.log '点击查看按钮的动作拉取数据', data
+      #self.close(nid)
+    )
 
   isAllow: (cb)->
     @notification.getPermissionLevel (permission)->
@@ -93,10 +91,15 @@ class Notification
     @browser = factory.getBrowser()
 
   show: (message)->
-    @browser.show(message)
+    @browser.show(message, (nid)->
+      console.log 'create nid', nid
+      message.timestamp = new Date().getTime()
+      storage.set nid, message
+    )
 
 
 if window.BHFService
   utils = window.BHFService.utils
+  storage = window.BHFService.storage
   window.BHFService.notification = new Notification(new Factory())
 
