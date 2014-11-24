@@ -9,7 +9,8 @@
     "background",
     "notifications",
     "storage",
-    "http://localhost:3000/"
+    "http://localhost:3000/",
+    "*://bhf.hunantv.com/"
   ],
   "icons": {
     "16": "assets/icon_16.png",

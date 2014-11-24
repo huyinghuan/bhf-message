@@ -1,10 +1,10 @@
 (function() {
   var socket;
 
-  socket = io('http://localhost:3000');
+  socket = io('ws://localhost:8001');
 
-  socket.on('news', function(data) {
-    return console.log(data);
+  socket.on('message', function(response) {
+    return console.log(response);
   });
 
 }).call(this);
