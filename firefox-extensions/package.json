@@ -1,0 +1,9 @@
+{
+  "name": "bhf-message",
+  "title": "bhf",
+  "id": "jid1-rNcECu5yzOuB8w",
+  "description": "a message notification for BHF",
+  "author": "ec.huyinghuan@gmail.com",
+  "license": "MPL 2.0",
+  "version": "0.1"
+}
