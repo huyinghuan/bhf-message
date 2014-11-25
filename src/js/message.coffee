@@ -98,7 +98,7 @@ class Message
   ready: ->
     self = @
     if self.flag
-      console.log 'emit ready'
+      console.log 'message ready'
       @socket.emit('ready')
     else
       setTimeout(->

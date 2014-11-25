@@ -141,7 +141,7 @@
       var self;
       self = this;
       if (self.flag) {
-        console.log('emit ready');
+        console.log('message ready');
         return this.socket.emit('ready');
       } else {
         return setTimeout(function() {

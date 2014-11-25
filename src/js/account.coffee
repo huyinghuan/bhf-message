@@ -2,7 +2,10 @@ baseURL = ''
 class Account
   constructor: (@message)->
     @api = "#{baseURL}/api/session"
-    @checkLogin()
+    self = @
+    @checkLogin(()->
+      self.message.ready()
+    )
 
   login: (username, password, cb)->
     self = @
@@ -21,7 +24,7 @@ class Account
       error: (x, type)-> console.log 2, x, type
     )
 
-  isLogin: (cb)->
+  checkLogin: (cb)->
     self = @
     $.ajax(
       type: 'GET'
@@ -39,12 +42,6 @@ class Account
         console.log 'user exit', data
         cb and cb()
       error: ()-> cb and cb()
-    )
-
-  checkLogin: ()->
-    self = @
-    @isLogin(()->
-      self.message.ready()
     )
 
 if window.BHFService

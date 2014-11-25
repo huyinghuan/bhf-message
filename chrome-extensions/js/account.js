@@ -5,9 +5,13 @@
 
   Account = (function() {
     function Account(message) {
+      var self;
       this.message = message;
       this.api = "" + baseURL + "/api/session";
-      this.checkLogin();
+      self = this;
+      this.checkLogin(function() {
+        return self.message.ready();
+      });
     }
 
     Account.prototype.login = function(username, password, cb) {
@@ -31,7 +35,7 @@
       });
     };
 
-    Account.prototype.isLogin = function(cb) {
+    Account.prototype.checkLogin = function(cb) {
       var self;
       self = this;
       return $.ajax({
@@ -50,21 +54,13 @@
       return $.ajax({
         type: 'DELETE',
         url: self.api,
-        success: function() {
-          console.log('user exit');
+        success: function(data) {
+          console.log('user exit', data);
           return cb && cb();
         },
         error: function() {
           return cb && cb();
         }
-      });
-    };
-
-    Account.prototype.checkLogin = function() {
-      var self;
-      self = this;
-      return this.isLogin(function() {
-        return self.message.ready();
       });
     };
 

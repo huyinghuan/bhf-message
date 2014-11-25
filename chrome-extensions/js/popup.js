@@ -1,5 +1,5 @@
 (function() {
-  var $, LoginTemplate, Popup, UnLoginTemplate, account;
+  var $, HasUserTemplate, NoUserTemplate, Popup, account;
 
   account = chrome.extension.getBackgroundPage().BHFService.account;
 
@@ -14,60 +14,60 @@
     }
   };
 
-  LoginTemplate = (function() {
-    function LoginTemplate(account, data) {
+  HasUserTemplate = (function() {
+    function HasUserTemplate(account, data) {
       this.account = account;
       this.initTemplate(data);
       this.initElement();
       this.bindEvent();
     }
 
-    LoginTemplate.prototype.initTemplate = function(data) {
+    HasUserTemplate.prototype.initTemplate = function(data) {
       var ele, source;
-      ele = $("#loginPageTemplate");
+      ele = $("#hasUserPageTemplate");
       source = ele.innerHTML;
       this.template = Handlebars.compile(source);
       return $('#content').innerHTML = this.template(data);
     };
 
-    LoginTemplate.prototype.initElement = function() {
+    HasUserTemplate.prototype.initElement = function() {
       return this.element = {
         logout: $('#logout')
       };
     };
 
-    LoginTemplate.prototype.bindEvent = function() {
+    HasUserTemplate.prototype.bindEvent = function() {
       var $ele, self;
       self = this;
       $ele = this.element;
       return $ele.logout.addEventListener('click', function() {
         return self.account.logout(function() {
-          return new UnLoginTemplate(self.account);
+          return new NoUserTemplate(self.account);
         });
       });
     };
 
-    return LoginTemplate;
+    return HasUserTemplate;
 
   })();
 
-  UnLoginTemplate = (function() {
-    function UnLoginTemplate(account) {
+  NoUserTemplate = (function() {
+    function NoUserTemplate(account) {
       this.account = account;
       this.initTemplate();
       this.initElement();
       this.bindEvent();
     }
 
-    UnLoginTemplate.prototype.initTemplate = function() {
+    NoUserTemplate.prototype.initTemplate = function() {
       var ele, source;
-      ele = $("#unLoginPageTemplate");
+      ele = $("#noUserPageTemplate");
       source = ele.innerHTML;
       this.template = Handlebars.compile(source);
       return $('#content').innerHTML = this.template();
     };
 
-    UnLoginTemplate.prototype.initElement = function() {
+    NoUserTemplate.prototype.initElement = function() {
       return this.element = {
         username: $('#username'),
         password: $('#password'),
@@ -75,7 +75,7 @@
       };
     };
 
-    UnLoginTemplate.prototype.bindEvent = function() {
+    NoUserTemplate.prototype.bindEvent = function() {
       var $login, self;
       $login = this.element.login;
       self = this;
@@ -84,19 +84,18 @@
       });
     };
 
-    UnLoginTemplate.prototype.login = function() {
+    NoUserTemplate.prototype.login = function() {
       var $ele, password, self, username;
       self = this;
       $ele = this.element;
       username = $ele.username.value;
       password = $ele.password.value;
       return this.account.login(username, password, function(data) {
-        console.log(data);
-        return new LoginTemplate(self.account, data);
+        return new HasUserTemplate(self.account, data);
       });
     };
 
-    return UnLoginTemplate;
+    return NoUserTemplate;
 
   })();
 
@@ -109,12 +108,12 @@
     Popup.prototype.checkLogin = function() {
       var self;
       self = this;
-      return this.account.isLogin(function(data) {
-        console.log(data);
+      return this.account.checkLogin(function(data) {
+        console.log('checkLogin', data);
         if (data) {
-          return new LoginTemplate(self.account, data);
+          return new HasUserTemplate(self.account, data);
         } else {
-          return new UnLoginTemplate(self.account);
+          return new NoUserTemplate(self.account);
         }
       });
     };

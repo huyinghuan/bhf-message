@@ -1,4 +1,6 @@
-account = chrome.extension.getBackgroundPage().BHFService.account
+BHFService = chrome.extension.getBackgroundPage().BHFService
+account = BHFService.account
+message = BHFService.message
 
 $ = (selector)->
   idReg = /^#/
@@ -8,14 +10,14 @@ $ = (selector)->
   else
     document.querySelector(selector)
 
-class LoginTemplate
+class HasUserTemplate
   constructor: (@account, data)->
     @initTemplate(data)
     @initElement()
     @bindEvent()
 
   initTemplate: (data)->
-    ele = $("#loginPageTemplate")
+    ele = $("#hasUserPageTemplate")
     source   = ele.innerHTML;
     @template = Handlebars.compile(source);
     $('#content').innerHTML = @template(data)
@@ -29,16 +31,16 @@ class LoginTemplate
     $ele = @element
     $ele.logout.addEventListener 'click', ->
       self.account.logout ()->
-        new UnLoginTemplate(self.account)
+        new NoUserTemplate(self.account)
 
-class UnLoginTemplate
+class NoUserTemplate
   constructor: (@account)->
     @initTemplate()
     @initElement()
     @bindEvent()
 
   initTemplate: ->
-    ele = $("#unLoginPageTemplate")
+    ele = $("#noUserPageTemplate")
     source   = ele.innerHTML;
     @template = Handlebars.compile(source);
     $('#content').innerHTML = @template()
@@ -61,8 +63,7 @@ class UnLoginTemplate
     username = $ele.username.value
     password = $ele.password.value
     @account.login username, password, (data)->
-      console.log data
-      new LoginTemplate(self.account, data)
+      new HasUserTemplate(self.account, data)
 
 
 class Popup
@@ -71,11 +72,11 @@ class Popup
 
   checkLogin: ->
     self = @
-    @account.isLogin (data)->
-      console.log data
+    @account.checkLogin (data)->
+      console.log 'checkLogin', data
       if data
-        new LoginTemplate(self.account, data)
+        new HasUserTemplate(self.account, data)
       else
-        new UnLoginTemplate(self.account)
+        new NoUserTemplate(self.account)
 
 new Popup(account)
