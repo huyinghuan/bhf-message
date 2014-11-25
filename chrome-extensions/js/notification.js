@@ -29,6 +29,13 @@
       if (data.title) {
         options.title = data.title;
       }
+      if (!data.link) {
+        options.buttons = [
+          {
+            title: '忽略'
+          }
+        ];
+      }
       this.notification.create('', options, function(nid) {
         return cb && cb(nid);
       });
@@ -43,7 +50,7 @@
         type: "basic",
         title: "BHF 消息",
         message: 'Test Message',
-        iconUrl: "assets/icon_16.png",
+        iconUrl: "assets/icon_128.png",
         buttons: [
           {
             title: '查看'
@@ -74,6 +81,9 @@
       var self;
       self = this;
       return storage.get(nid, function(data) {
+        if (!data.link) {
+          return self.close(nid);
+        }
         return console.log('点击查看按钮的动作拉取数据', data);
       });
     };

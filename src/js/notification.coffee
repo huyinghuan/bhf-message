@@ -17,6 +17,9 @@ class ChromeBrowser
     options.message = data.message if data.message
     options.title = data.title if data.title
 
+    if not data.link
+      options.buttons = [{title: '忽略'}]
+
     @notification.create('', options, (nid)-> cb and cb(nid))
 
     #设置浏览器上面的文字
@@ -27,7 +30,7 @@ class ChromeBrowser
       type: "basic",
       title: "BHF 消息",
       message: 'Test Message'
-      iconUrl: "assets/icon_16.png"
+      iconUrl: "assets/icon_128.png"
       buttons: [
         {title: '查看'}
         {title: '忽略'}
@@ -47,6 +50,8 @@ class ChromeBrowser
   click: (nid)->
     self = @
     storage.get(nid, (data)->
+      if not data.link
+        return self.close(nid)
       console.log '点击查看按钮的动作拉取数据', data
       #self.close(nid)
     )

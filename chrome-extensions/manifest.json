@@ -10,6 +10,7 @@
     "notifications",
     "storage",
     "http://localhost:3000/",
+    "http://localhost:8001/",
     "*://bhf.hunantv.com/"
   ],
   "icons": {
@@ -27,6 +28,5 @@
     "default_icon": "assets/icon_19.png",
     "default_popup": "popup.html"
   },
-
-  "content_security_policy": "script-src 'self' http://localhost:3000; object-src 'self'"
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

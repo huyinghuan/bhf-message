@@ -1,4 +1,4 @@
-Service = chrome.extension.getBackgroundPage().BHFService
+account = chrome.extension.getBackgroundPage().BHFService.account
 
 $ = (selector)->
   idReg = /^#/
@@ -8,10 +8,40 @@ $ = (selector)->
   else
     document.querySelector(selector)
 
-class BrowserAction
-  constructor: (@service)->
+class LoginTemplate
+  constructor: (@account, data)->
+    @initTemplate(data)
     @initElement()
     @bindEvent()
+
+  initTemplate: (data)->
+    ele = $("#loginPageTemplate")
+    source   = ele.innerHTML;
+    @template = Handlebars.compile(source);
+    $('#content').innerHTML = @template(data)
+
+  initElement: ->
+    @element =
+      logout: $('#logout')
+
+  bindEvent: ->
+    self = @
+    $ele = @element
+    $ele.logout.addEventListener 'click', ->
+      self.account.logout ()->
+        new UnLoginTemplate(self.account)
+
+class UnLoginTemplate
+  constructor: (@account)->
+    @initTemplate()
+    @initElement()
+    @bindEvent()
+
+  initTemplate: ->
+    ele = $("#unLoginPageTemplate")
+    source   = ele.innerHTML;
+    @template = Handlebars.compile(source);
+    $('#content').innerHTML = @template()
 
   initElement: ->
     @element =
@@ -26,11 +56,26 @@ class BrowserAction
       self.login()
 
   login: ->
+    self = @
     $ele = @element
     username = $ele.username.value
     password = $ele.password.value
-    @service.account.login username, password
+    @account.login username, password, (data)->
+      console.log data
+      new LoginTemplate(self.account, data)
 
-  logout: ->
 
-new BrowserAction(Service)
+class Popup
+  constructor: (@account)->
+    @checkLogin()
+
+  checkLogin: ->
+    self = @
+    @account.isLogin (data)->
+      console.log data
+      if data
+        new LoginTemplate(self.account, data)
+      else
+        new UnLoginTemplate(self.account)
+
+new Popup(account)

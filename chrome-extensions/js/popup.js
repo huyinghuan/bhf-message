@@ -1,7 +1,7 @@
 (function() {
-  var $, BrowserAction, Service;
+  var $, LoginTemplate, Popup, UnLoginTemplate, account;
 
-  Service = chrome.extension.getBackgroundPage().BHFService;
+  account = chrome.extension.getBackgroundPage().BHFService.account;
 
   $ = function(selector) {
     var idReg;
@@ -14,14 +14,60 @@
     }
   };
 
-  BrowserAction = (function() {
-    function BrowserAction(service) {
-      this.service = service;
+  LoginTemplate = (function() {
+    function LoginTemplate(account, data) {
+      this.account = account;
+      this.initTemplate(data);
       this.initElement();
       this.bindEvent();
     }
 
-    BrowserAction.prototype.initElement = function() {
+    LoginTemplate.prototype.initTemplate = function(data) {
+      var ele, source;
+      ele = $("#loginPageTemplate");
+      source = ele.innerHTML;
+      this.template = Handlebars.compile(source);
+      return $('#content').innerHTML = this.template(data);
+    };
+
+    LoginTemplate.prototype.initElement = function() {
+      return this.element = {
+        logout: $('#logout')
+      };
+    };
+
+    LoginTemplate.prototype.bindEvent = function() {
+      var $ele, self;
+      self = this;
+      $ele = this.element;
+      return $ele.logout.addEventListener('click', function() {
+        return self.account.logout(function() {
+          return new UnLoginTemplate(self.account);
+        });
+      });
+    };
+
+    return LoginTemplate;
+
+  })();
+
+  UnLoginTemplate = (function() {
+    function UnLoginTemplate(account) {
+      this.account = account;
+      this.initTemplate();
+      this.initElement();
+      this.bindEvent();
+    }
+
+    UnLoginTemplate.prototype.initTemplate = function() {
+      var ele, source;
+      ele = $("#unLoginPageTemplate");
+      source = ele.innerHTML;
+      this.template = Handlebars.compile(source);
+      return $('#content').innerHTML = this.template();
+    };
+
+    UnLoginTemplate.prototype.initElement = function() {
       return this.element = {
         username: $('#username'),
         password: $('#password'),
@@ -29,7 +75,7 @@
       };
     };
 
-    BrowserAction.prototype.bindEvent = function() {
+    UnLoginTemplate.prototype.bindEvent = function() {
       var $login, self;
       $login = this.element.login;
       self = this;
@@ -38,20 +84,45 @@
       });
     };
 
-    BrowserAction.prototype.login = function() {
-      var $ele, password, username;
+    UnLoginTemplate.prototype.login = function() {
+      var $ele, password, self, username;
+      self = this;
       $ele = this.element;
       username = $ele.username.value;
       password = $ele.password.value;
-      return this.service.account.login(username, password);
+      return this.account.login(username, password, function(data) {
+        console.log(data);
+        return new LoginTemplate(self.account, data);
+      });
     };
 
-    BrowserAction.prototype.logout = function() {};
-
-    return BrowserAction;
+    return UnLoginTemplate;
 
   })();
 
-  new BrowserAction(Service);
+  Popup = (function() {
+    function Popup(account) {
+      this.account = account;
+      this.checkLogin();
+    }
+
+    Popup.prototype.checkLogin = function() {
+      var self;
+      self = this;
+      return this.account.isLogin(function(data) {
+        console.log(data);
+        if (data) {
+          return new LoginTemplate(self.account, data);
+        } else {
+          return new UnLoginTemplate(self.account);
+        }
+      });
+    };
+
+    return Popup;
+
+  })();
+
+  new Popup(account);
 
 }).call(this);

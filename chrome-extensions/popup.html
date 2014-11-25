@@ -5,19 +5,31 @@
   <link href="css/popup.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-<div>
+
+<script  id="unLoginPageTemplate" type="text/x-handlebars-template">
   <div id="unLoginPage">
     <h1>Welcome to BHF</h1>
     <div>
-       <label>用户名:</label><input type="text" id="username"/>
+      <label>用户名:</label><input type="text" id="username" value="胡瀛寰"/>
     </div>
     <div>
-      <label>密码：</label><input type="text" id="password"/>
+      <label>密码：</label><input type="text" id="password" value="888888"/>
     </div>
     <div><button id="login">登录</button></div>
   </div>
-  <div id="LoginPage"></div>
+</script>
+
+<script id="loginPageTemplate" type="text/x-handlebars-template">
+  <div id="LoginPage">
+    <h2>欢迎你！{{username}}</h2>
+    <button id="logout">注销</button>
+  </div>
+</script>
+
+<div id="content">
 </div>
+
+<script src="js/lib/handlebars.js"></script>
 <script src="js/popup.js"></script>
 </body>
 </html>
