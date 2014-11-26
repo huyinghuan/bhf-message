@@ -54,12 +54,16 @@
     };
 
     MessageType.prototype.issueChange = function(response) {
-      var link, message, msg, title;
+      var id, link, message, msg, priority, priorityName, tag, title;
       if (response.data.issue.status !== 'done') {
         return;
       }
-      title = response.data.issue.tag + '已完成！';
-      message = "通关" + response.data.issue.title;
+      priority = ['', '', '紧急', '', ''];
+      tag = response.data.issue.tag;
+      id = response.data.issue.id;
+      priorityName = priority[response.data.issue.priority];
+      title = "" + priorityName + tag + "#" + id + "# 已完成！";
+      message = "" + response.sender.realname + "解决了: \n\"" + response.data.issue.title + "\"";
       link = link = response.data.link;
       return msg = {
         link: link,
@@ -112,13 +116,13 @@
   })();
 
   Message = (function() {
-    function Message(notification, messageType) {
+    function Message() {
       this.notification = notification;
-      this.messageType = messageType;
-      this.initListener();
+      this.messageType = new MessageType();
+      this.prepareSocket();
     }
 
-    Message.prototype.initListener = function() {
+    Message.prototype.prepareSocket = function() {
       var self, socket;
       self = this;
       this.socket = socket = io.connect(ServerIP);
@@ -131,23 +135,17 @@
         }
         return self.notification.show(message);
       });
-      return socket.on('connect', function() {
-        self.flag = true;
-        return console.log('connect ready');
+      socket.on('connect', function() {
+        console.log('已连接');
+        return socket.emit('ready');
       });
-    };
-
-    Message.prototype.ready = function() {
-      var self;
-      self = this;
-      if (self.flag) {
-        console.log('message ready');
-        return this.socket.emit('ready');
-      } else {
-        return setTimeout(function() {
-          return self.ready();
-        }, 500);
-      }
+      socket.on('disconnect', function() {
+        return console.log('断开连接');
+      });
+      return socket.on('reconnect', function() {
+        console.log('重新连接');
+        return socket.emit('ready');
+      });
     };
 
     return Message;
@@ -157,7 +155,7 @@
   if (window.BHFService) {
     ServerIP = window.BHFService.socketURL;
     notification = window.BHFService.notification;
-    window.BHFService.message = new Message(notification, new MessageType());
+    window.BHFService.Message = Message;
   }
 
 }).call(this);

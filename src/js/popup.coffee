@@ -1,6 +1,5 @@
 BHFService = chrome.extension.getBackgroundPage().BHFService
 account = BHFService.account
-message = BHFService.message
 
 $ = (selector)->
   idReg = /^#/
@@ -62,21 +61,23 @@ class NoUserTemplate
     $ele = @element
     username = $ele.username.value
     password = $ele.password.value
-    @account.login username, password, (data)->
-      new HasUserTemplate(self.account, data)
+    @account.login username, password, (error, data)->
+      if not error
+        new HasUserTemplate(self.account, data)
+      else
+        self.showError(error)
 
+  showError: (error)->
+    $('#errorMsg').innerHTML = error
 
 class Popup
   constructor: (@account)->
-    @checkLogin()
-
-  checkLogin: ->
     self = @
-    @account.checkLogin (data)->
-      console.log 'checkLogin', data
-      if data
+    @account.checkLogin(
+      (data)->
         new HasUserTemplate(self.account, data)
-      else
+      ,()->
         new NoUserTemplate(self.account)
+    )
 
 new Popup(account)

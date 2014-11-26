@@ -40,9 +40,16 @@ class MessageType
 
   issueChange: (response)->
     return if response.data.issue.status isnt 'done'
-    title = response.data.issue.tag + '已完成！'
-    message = "通关#{response.data.issue.title}"
+    priority = ['', '', '紧急', '', '']
+    tag = response.data.issue.tag
+    id = response.data.issue.id
+    priorityName  = priority[response.data.issue.priority]
+    title = "#{priorityName}#{tag}##{id}# 已完成！"
+
+    message = "#{response.sender.realname}解决了:
+      \n\"#{response.data.issue.title}\""
     link = link = response.data.link
+
     msg =
       link: link
       title: title
@@ -78,10 +85,12 @@ class MessageType
       link: link
 
 class Message
-  constructor: (@notification, @messageType)->
-    @initListener()
+  constructor: ()->
+    @notification = notification
+    @messageType = new MessageType()
+    @prepareSocket()
 
-  initListener: ->
+  prepareSocket: ->
     self = @
     @socket = socket = io.connect ServerIP
     socket.on('message', (data)->
@@ -90,23 +99,19 @@ class Message
       return if not message
       self.notification.show message
     )
-    socket.on('connect', ()->
-      self.flag =  true
-      console.log 'connect ready'
-    )
+    socket.on 'connect', ()->
+      console.log '已连接'
+      socket.emit 'ready'
 
-  ready: ->
-    self = @
-    if self.flag
-      console.log 'message ready'
-      @socket.emit('ready')
-    else
-      setTimeout(->
-        self.ready()
-      , 500)
+    socket.on 'disconnect', ()->
+      console.log '断开连接'
+
+    socket.on 'reconnect', ()->
+      console.log '重新连接'
+      socket.emit 'ready'
 
 
 if window.BHFService
   ServerIP = window.BHFService.socketURL
   notification = window.BHFService.notification
-  window.BHFService.message = new Message(notification, new MessageType())
+  window.BHFService.Message = Message

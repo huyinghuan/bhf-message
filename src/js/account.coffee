@@ -1,10 +1,31 @@
 baseURL = ''
 class Account
-  constructor: (@message)->
+  constructor: ()->
     @api = "#{baseURL}/api/session"
+    @message = null
     self = @
     @checkLogin(()->
-      self.message.ready()
+      self.prepareMessage()
+    )
+
+  prepareMessage: (destory = false)->
+    return @message = new Message() if destory isnt true
+    @message = null
+
+  getRemoteData: (setting)->
+    type = setting.type or 'GET'
+    data = setting.data or {}
+    success = setting.success or ->
+    error = setting.error or ->
+    url = @api
+    $.ajax(
+      type: type
+      url: url
+      data: data
+      success: (data)->
+        success and success(data)
+      error: ()->
+        error and error()
     )
 
   login: (username, password, cb)->
@@ -13,38 +34,36 @@ class Account
       account: username
       password: password
 
-    $.ajax(
+    setting =
       type: 'POST'
-      url: self.api
       data: user
       success: (data)->
-        self.message.ready()
-        cb and cb(data)
+        self.prepareMessage()
+        cb and cb(null, data)
+      error: ->
+        cb and cb('用户名或密码错误！')
 
-      error: (x, type)-> console.log 2, x, type
-    )
+    @getRemoteData setting
 
-  checkLogin: (cb)->
-    self = @
-    $.ajax(
-      type: 'GET'
-      url: self.api
+
+  checkLogin: (success, error)->
+    setting =
       success: (data)->
-        cb and cb(data)
-      error: ()-> cb and cb(false)
-    )
+        success and success(data)
+      error: ->
+        error and error('用户名或密码错误！')
+
+    @getRemoteData setting
 
   logout: (cb)->
-    $.ajax(
+    setting =
       type: 'DELETE'
-      url: self.api
-      success: (data)->
-        console.log 'user exit', data
+      success: ->
+        self.prepareMessage(true)
         cb and cb()
-      error: ()-> cb and cb()
-    )
+    @getRemoteData setting
 
 if window.BHFService
   baseURL = window.BHFService.baseURL
-  message = window.BHFService.message
-  window.BHFService.account = new Account(message)
+  Message = window.BHFService.Message
+  window.BHFService.account = new Account()

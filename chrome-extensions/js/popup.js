@@ -1,7 +1,9 @@
 (function() {
-  var $, HasUserTemplate, NoUserTemplate, Popup, account;
+  var $, BHFService, HasUserTemplate, NoUserTemplate, Popup, account;
 
-  account = chrome.extension.getBackgroundPage().BHFService.account;
+  BHFService = chrome.extension.getBackgroundPage().BHFService;
+
+  account = BHFService.account;
 
   $ = function(selector) {
     var idReg;
@@ -90,9 +92,17 @@
       $ele = this.element;
       username = $ele.username.value;
       password = $ele.password.value;
-      return this.account.login(username, password, function(data) {
-        return new HasUserTemplate(self.account, data);
+      return this.account.login(username, password, function(error, data) {
+        if (!error) {
+          return new HasUserTemplate(self.account, data);
+        } else {
+          return self.showError(error);
+        }
       });
+    };
+
+    NoUserTemplate.prototype.showError = function(error) {
+      return $('#errorMsg').innerHTML = error;
     };
 
     return NoUserTemplate;
@@ -101,22 +111,15 @@
 
   Popup = (function() {
     function Popup(account) {
-      this.account = account;
-      this.checkLogin();
-    }
-
-    Popup.prototype.checkLogin = function() {
       var self;
+      this.account = account;
       self = this;
-      return this.account.checkLogin(function(data) {
-        console.log('checkLogin', data);
-        if (data) {
-          return new HasUserTemplate(self.account, data);
-        } else {
-          return new NoUserTemplate(self.account);
-        }
+      this.account.checkLogin(function(data) {
+        return new HasUserTemplate(self.account, data);
+      }, function() {
+        return new NoUserTemplate(self.account);
       });
-    };
+    }
 
     return Popup;
 
