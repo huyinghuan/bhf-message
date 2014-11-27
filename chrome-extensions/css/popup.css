@@ -17,6 +17,16 @@ h1{
 #hasUserPage{
     width: 380px;
 }
+
+#hasUserPage #logout{
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+#hasUserPage ul li a{
+    margin-left: 10px;
+}
+
 .form{
     width: 100%;
 }

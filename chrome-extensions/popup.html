@@ -40,15 +40,20 @@
 
 <script id="hasUserPageTemplate" type="text/x-handlebars-template">
   <div id="hasUserPage">
-    <h2>欢迎你！{{username}}</h2>
-    <button id="logout">注销</button>
+    <h1>你好！ {{username}} <a href="#" id="logout">注销</a></h1>
+    <hr>
+    <ul>
+      <li>当前有N条消息未读. <a href="#">阅读</a></li>
+      <li>当前有N条任务未处理完. <a href="#">查看</a></li>
+      <li>本周已完成N个任务. <a href="#">周报</a></li>
+    </ul>
   </div>
 </script>
 
 <div id="content">
 </div>
 
-<script src="js/lib/handlebars.js"></script>
-<script src="js/popup.js"></script>
+<!--<script src="js/lib/handlebars.js"></script>-->
+<!--<script src="js/popup.js"></script>-->
 </body>
 </html>
