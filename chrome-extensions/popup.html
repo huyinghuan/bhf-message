@@ -9,14 +9,32 @@
 <script  id="noUserPageTemplate" type="text/x-handlebars-template">
   <div id="noUserPage">
     <h1>Welcome to BHF</h1>
-    <div>
-      <label>用户名:</label><input type="text" id="username" value="胡瀛寰"/>
+    <hr>
+    <div class="form">
+      <div class="form-controller">
+        <div class="form-label">
+          <label for="username">用户名:</label>
+        </div>
+        <div>
+          <input class="form-input" type="text" id="username" value="胡瀛寰" placeholder="用户名或邮箱"/>
+        </div>
+      </div>
+      <div class="form-controller center">
+        <span id="errorMsg" class="form-info-error"></span>
+      </div>
+      <div class="form-controller">
+        <div class="form-label">
+          <label for="password" >密码:</label>
+        </div>
+        <div>
+          <input class="form-input" type="text" id="password" value="888888" placeholder="密码"/>
+        </div>
+      </div>
+
+      <div class="form-controller right">
+        <button id="login" class="btn btn-primary">登录</button>
+      </div>
     </div>
-    <div>
-      <label>密码：</label><input type="text" id="password" value="888888"/>
-    </div>
-    <div><button id="login">登录</button></div>
-    <span id="errorMsg"></span>
   </div>
 </script>
 
