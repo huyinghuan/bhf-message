@@ -9,14 +9,15 @@
     "background",
     "notifications",
     "storage",
-    "http://localhost:3000/",
     "http://localhost:8001/",
-    "*://bhf.hunantv.com/"
+    "*://bhf.hunantv.com:8001/",
+    "tabs"
   ],
   "icons": {
     "16": "assets/icon_16.png",
     "128": "assets/icon_128.png",
-    "19": "assets/icon_19.png"
+    "19": "assets/icon_19.png",
+    "36": "assets/icon_36.png"
   },
 
   "background": {

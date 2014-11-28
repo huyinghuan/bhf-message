@@ -9,6 +9,7 @@ class ChromeBrowser
   constructor: ->
     @notification = chrome.notifications
     @browserAction = chrome.browserAction
+    @tabs = chrome.tabs
     @initEvent()
 
   show: (data = {}, cb)->
@@ -53,7 +54,15 @@ class ChromeBrowser
       if not data.link
         return self.close(nid)
       console.log '点击查看按钮的动作拉取数据', data
-      #self.close(nid)
+      self.open(data.link)
+    )
+
+  open: (url)->
+    url = "/#{url}".replace(/\/+/g, '/')
+    url = "#{_website}#{url}"
+    self = @
+    @tabs.create(url: url, ()->
+      self.close()
     )
 
   isAllow: (cb)->
@@ -106,5 +115,6 @@ class Notification
 if window.BHFService
   utils = window.BHFService.utils
   storage = window.BHFService.storage
+  _website = window.BHFService.website
   window.BHFService.notification = new Notification(new Factory())
 

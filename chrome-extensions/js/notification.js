@@ -4,7 +4,7 @@
  */
 
 (function() {
-  var ChromeBrowser, Factory, FireFoxBrowser, Notification, SafariBrowser, storage, utils;
+  var ChromeBrowser, Factory, FireFoxBrowser, Notification, SafariBrowser, storage, utils, _website;
 
   utils = {};
 
@@ -14,6 +14,7 @@
     function ChromeBrowser() {
       this.notification = chrome.notifications;
       this.browserAction = chrome.browserAction;
+      this.tabs = chrome.tabs;
       this.initEvent();
     }
 
@@ -84,7 +85,20 @@
         if (!data.link) {
           return self.close(nid);
         }
-        return console.log('点击查看按钮的动作拉取数据', data);
+        console.log('点击查看按钮的动作拉取数据', data);
+        return self.open(data.link);
+      });
+    };
+
+    ChromeBrowser.prototype.open = function(url) {
+      var self;
+      url = ("/" + url).replace(/\/+/g, '/');
+      url = "" + _website + url;
+      self = this;
+      return this.tabs.create({
+        url: url
+      }, function() {
+        return self.close();
       });
     };
 
@@ -163,6 +177,7 @@
   if (window.BHFService) {
     utils = window.BHFService.utils;
     storage = window.BHFService.storage;
+    _website = window.BHFService.website;
     window.BHFService.notification = new Notification(new Factory());
   }
 
