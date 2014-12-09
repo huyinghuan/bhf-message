@@ -86,11 +86,11 @@
           return self.close(nid);
         }
         console.log('点击查看按钮的动作拉取数据', data);
-        return self.open(data.link);
+        return self.open(data.link, nid);
       });
     };
 
-    ChromeBrowser.prototype.open = function(url) {
+    ChromeBrowser.prototype.open = function(url, nid) {
       var self;
       url = ("/" + url).replace(/\/+/g, '/');
       url = "" + _website + url;
@@ -98,7 +98,7 @@
       return this.tabs.create({
         url: url
       }, function() {
-        return self.close();
+        return self.close(nid);
       });
     };
 

@@ -79,7 +79,8 @@
     };
 
     Account.prototype.logout = function(cb) {
-      var setting;
+      var self, setting;
+      self = this;
       setting = {
         type: 'DELETE',
         success: function() {

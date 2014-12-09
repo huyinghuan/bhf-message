@@ -10,7 +10,7 @@
     "notifications",
     "storage",
     "http://localhost:8001/",
-    "*://bhf.hunantv.com:8001/",
+    "*://bhf.hunantv.com/*",
     "tabs"
   ],
   "icons": {

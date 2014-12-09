@@ -57,7 +57,7 @@ class MessageType
 
   issueAssigned: (response)->
     message = response.data.issue.title
-    priority = ['', '', '紧急', '一般', '可延后']
+    priority = ['', '', '紧急', '一般', '可延后', '']
     title = "#{priority[response.data.issue.priority]}任务来了！"
     finishTime = response.data.issue.plan_finish_time
     if finishTime

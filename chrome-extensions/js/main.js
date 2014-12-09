@@ -1,7 +1,7 @@
 (function() {
   var BHFService, dev, socketURL, testSocketURL, testURL, testWebsite, url, website;
 
-  dev = true;
+  dev = false;
 
   window.BHFService = BHFService = {};
 

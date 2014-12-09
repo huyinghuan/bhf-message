@@ -56,6 +56,7 @@ class Account
     @getRemoteData setting
 
   logout: (cb)->
+    self = @
     setting =
       type: 'DELETE'
       success: ->

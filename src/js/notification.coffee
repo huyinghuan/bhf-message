@@ -54,15 +54,15 @@ class ChromeBrowser
       if not data.link
         return self.close(nid)
       console.log '点击查看按钮的动作拉取数据', data
-      self.open(data.link)
+      self.open(data.link, nid)
     )
 
-  open: (url)->
+  open: (url, nid)->
     url = "/#{url}".replace(/\/+/g, '/')
     url = "#{_website}#{url}"
     self = @
     @tabs.create(url: url, ()->
-      self.close()
+      self.close(nid)
     )
 
   isAllow: (cb)->

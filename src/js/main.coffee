@@ -1,4 +1,4 @@
-dev = true
+dev = false
 window.BHFService = BHFService = {}
 testURL = 'http://localhost:8001'
 testSocketURL = 'ws://localhost:8001'
