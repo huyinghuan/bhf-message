@@ -35,7 +35,8 @@
       return this.element = {
         logout: $('#logout'),
         messageList: $('#messageList'),
-        hasReadAll: $('#hasReadAll')
+        hasReadAll: $('#hasReadAll'),
+        goToHome: $('#goHome')
       };
     };
 
@@ -61,10 +62,13 @@
           return $('.messageCount').html($('.messageCount').html() - 1);
         }
       });
-      return $ele.hasReadAll.on('click', function() {
+      $ele.hasReadAll.on('click', function() {
         self.message.setAllHasRead();
         $ele.messageList.find('li').remove();
         return $('.messageCount').html(0);
+      });
+      return $ele.goToHome.on('click', function() {
+        return window.open(baseURL);
       });
     };
 

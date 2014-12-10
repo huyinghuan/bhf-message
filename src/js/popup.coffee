@@ -27,6 +27,7 @@ class HasUserTemplate
       logout: $('#logout')
       messageList: $('#messageList')
       hasReadAll: $('#hasReadAll')
+      goToHome: $('#goHome')
 
   bindEvent: ->
     self = @
@@ -46,6 +47,9 @@ class HasUserTemplate
       self.message.setAllHasRead()
       $ele.messageList.find('li').remove()
       $('.messageCount').html 0
+
+    $ele.goToHome.on 'click', ->
+      window.open baseURL
 
 class NoUserTemplate
   constructor: (@account)->
