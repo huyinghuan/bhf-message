@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>bhf-message</title>
+  <script src="js/lib/zepto.js"></script>
   <link href="css/popup.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -45,15 +46,31 @@
   <div id="hasUserPage">
     <h1>你好！ {{username}} <a href="#" id="logout">注销</a></h1>
     <hr>
-    <ul>
-      <li>当前有N条消息未读. <a href="#">阅读</a></li>
-      <li>当前有N条任务未处理完. <a href="#">查看</a></li>
-      <li>本周已完成N个任务. <a href="#">周报</a></li>
-    </ul>
+    <div>
+      <h3>当前有<span class="messageCount">{{messageList.length}}</span>条消息未读</h3>
+      <ul id="messageList">
+        {{#each messageList}}
+          <li>
+            <span>{{content}}</span>
+            <a href="#" data-url="{{../baseURL}}{{link}}">查看</a>
+            <a href="#" data-id="{{id}}">已读</a>
+          </li>
+        {{/each}}
+      </ul>
+      <div>
+        <a href="#" id="hasReadAll">全部已读</a>
+        <a href="#" id="viewAll">查看全部
+          <span class="messageCount">{{messageList.length}}</span>
+            消息
+        </a>
+      </div>
+
+    </div>
   </div>
 </script>
 
 <div id="content">
+  加载数据中
 </div>
 
 <script src="js/lib/handlebars.js"></script>

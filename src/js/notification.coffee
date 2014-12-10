@@ -3,6 +3,7 @@
 ###
 utils = {}
 storage = {}
+messageList = null
 
 #chrome 浏览器的消息通知机制
 class ChromeBrowser
@@ -10,7 +11,9 @@ class ChromeBrowser
     @notification = chrome.notifications
     @browserAction = chrome.browserAction
     @tabs = chrome.tabs
+    @message = messageList
     @initEvent()
+    @listenerStorage()
 
   show: (data = {}, cb)->
     options = @getOptions()
@@ -23,8 +26,7 @@ class ChromeBrowser
 
     @notification.create('', options, (nid)-> cb and cb(nid))
 
-    #设置浏览器上面的文字
-    @browserAction.setBadgeText({text: "10+"});
+    @message.refresh()
 
   getOptions: ->
     setting =
@@ -63,14 +65,25 @@ class ChromeBrowser
     self = @
     @tabs.create(url: url, ()->
       self.close(nid)
+      storage.clear(nid)
     )
 
-  isAllow: (cb)->
-    @notification.getPermissionLevel (permission)->
-      if permission is 'granted'
-        cb && cb(true)
-      else
-        cb && cb(false)
+  #just for chrome
+  listenerStorage: ->
+    self = @
+    #设置浏览器上面的文字
+
+    storage.get 'newMessage', (data)->
+      self.setBadge data
+
+    chrome.storage.onChanged.addListener (changes)->
+      return if not changes['newMessage']
+      self.setBadge changes['newMessage'].newValue
+
+  setBadge: (items)->
+    items = [] if not items
+    text = if items.length then "#{items.length}" else ''
+    @browserAction.setBadgeText text: text
 
 #FireFox的消息通知机制
 class FireFoxBrowser
@@ -108,7 +121,7 @@ class Notification
     @browser.show(message, (nid)->
       console.log 'create nid', nid
       message.timestamp = new Date().getTime()
-      storage.set nid, message
+      storage.save nid, message
     )
 
 
@@ -116,5 +129,6 @@ if window.BHFService
   utils = window.BHFService.utils
   storage = window.BHFService.storage
   _website = window.BHFService.website
+  messageList = window.BHFService.messageList
   window.BHFService.notification = new Notification(new Factory())
 

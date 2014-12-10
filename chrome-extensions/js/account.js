@@ -1,5 +1,5 @@
 (function() {
-  var Account, Message, baseURL;
+  var Account, Message, baseURL, messageList;
 
   baseURL = '';
 
@@ -8,6 +8,7 @@
       var self;
       this.api = "" + baseURL + "/api/session";
       this.message = null;
+      this.messageList = messageList;
       self = this;
       this.checkLogin(function() {
         return self.prepareMessage();
@@ -19,9 +20,12 @@
         destory = false;
       }
       if (destory !== true) {
-        return this.message = new Message();
+        this.message = new Message();
+        return this.messageList.refresh();
+      } else {
+        this.message = null;
+        return this.messageList.clear();
       }
-      return this.message = null;
     };
 
     Account.prototype.getRemoteData = function(setting) {
@@ -98,6 +102,7 @@
   if (window.BHFService) {
     baseURL = window.BHFService.baseURL;
     Message = window.BHFService.Message;
+    messageList = window.BHFService.messageList;
     window.BHFService.account = new Account();
   }
 

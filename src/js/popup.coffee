@@ -1,36 +1,45 @@
 BHFService = chrome.extension.getBackgroundPage().BHFService
 account = BHFService.account
-
-$ = (selector)->
-  idReg = /^#/
-  if idReg.test selector
-    selector = selector.replace idReg, ''
-    return document.getElementById(selector)
-  else
-    document.querySelector(selector)
+messageList = BHFService.messageList
+baseURL = BHFService.website
 
 class HasUserTemplate
   constructor: (@account, data)->
+    @message = messageList
     @initTemplate(data)
-    @initElement()
-    @bindEvent()
+
 
   initTemplate: (data)->
+    data.baseURL = baseURL
+    self = @
     ele = $("#hasUserPageTemplate")
-    source   = ele.innerHTML;
-    @template = Handlebars.compile(source);
-    $('#content').innerHTML = @template(data)
+    source   = $(ele).html()
+    template = Handlebars.compile(source)
+    @message.get((items)->
+      data.messageList = items
+      $('#content').html template(data)
+      self.initElement()
+      self.bindEvent()
+    )
 
   initElement: ->
     @element =
       logout: $('#logout')
+      messageList: $('#messageList')
 
   bindEvent: ->
     self = @
     $ele = @element
-    $ele.logout.addEventListener 'click', ->
-      self.account.logout ()->
-        new NoUserTemplate(self.account)
+    $ele.logout.on 'click', ->
+      self.account.logout ()-> new NoUserTemplate(self.account)
+    $ele.messageList.find('a').on 'click', ->
+      url = $(this).data('url')
+      id = $(this).data('id')
+      window.open url if url
+      if id
+        self.message.setMessageAsRead(id)
+        $(this).parent('li').remove()
+        $('.messageCount').html $('.messageCount').html() - 1
 
 class NoUserTemplate
   constructor: (@account)->
@@ -40,9 +49,9 @@ class NoUserTemplate
 
   initTemplate: ->
     ele = $("#noUserPageTemplate")
-    source   = ele.innerHTML;
+    source   = ele.html();
     @template = Handlebars.compile(source);
-    $('#content').innerHTML = @template()
+    $('#content').html @template()
 
   initElement: ->
     @element =
@@ -53,14 +62,14 @@ class NoUserTemplate
   bindEvent: ->
     $login = @element.login
     self = @
-    $login.addEventListener 'click', ->
+    $login.on 'click', ->
       self.login()
 
   login: ->
     self = @
     $ele = @element
-    username = $ele.username.value
-    password = $ele.password.value
+    username = $ele.username.val()
+    password = $ele.password.val()
     @account.login username, password, (error, data)->
       if not error
         new HasUserTemplate(self.account, data)
@@ -68,7 +77,7 @@ class NoUserTemplate
         self.showError(error)
 
   showError: (error)->
-    $('#errorMsg').innerHTML = error
+    $('#errorMsg').html error
 
 class Popup
   constructor: (@account)->

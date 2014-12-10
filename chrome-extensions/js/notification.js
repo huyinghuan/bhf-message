@@ -4,18 +4,22 @@
  */
 
 (function() {
-  var ChromeBrowser, Factory, FireFoxBrowser, Notification, SafariBrowser, storage, utils, _website;
+  var ChromeBrowser, Factory, FireFoxBrowser, Notification, SafariBrowser, messageList, storage, utils, _website;
 
   utils = {};
 
   storage = {};
+
+  messageList = null;
 
   ChromeBrowser = (function() {
     function ChromeBrowser() {
       this.notification = chrome.notifications;
       this.browserAction = chrome.browserAction;
       this.tabs = chrome.tabs;
+      this.message = messageList;
       this.initEvent();
+      this.listenerStorage();
     }
 
     ChromeBrowser.prototype.show = function(data, cb) {
@@ -40,9 +44,7 @@
       this.notification.create('', options, function(nid) {
         return cb && cb(nid);
       });
-      return this.browserAction.setBadgeText({
-        text: "10+"
-      });
+      return this.message.refresh();
     };
 
     ChromeBrowser.prototype.getOptions = function() {
@@ -98,17 +100,33 @@
       return this.tabs.create({
         url: url
       }, function() {
-        return self.close(nid);
+        self.close(nid);
+        return storage.clear(nid);
       });
     };
 
-    ChromeBrowser.prototype.isAllow = function(cb) {
-      return this.notification.getPermissionLevel(function(permission) {
-        if (permission === 'granted') {
-          return cb && cb(true);
-        } else {
-          return cb && cb(false);
+    ChromeBrowser.prototype.listenerStorage = function() {
+      var self;
+      self = this;
+      storage.get('newMessage', function(data) {
+        return self.setBadge(data);
+      });
+      return chrome.storage.onChanged.addListener(function(changes) {
+        if (!changes['newMessage']) {
+          return;
         }
+        return self.setBadge(changes['newMessage'].newValue);
+      });
+    };
+
+    ChromeBrowser.prototype.setBadge = function(items) {
+      var text;
+      if (!items) {
+        items = [];
+      }
+      text = items.length ? "" + items.length : '';
+      return this.browserAction.setBadgeText({
+        text: text
       });
     };
 
@@ -166,7 +184,7 @@
       return this.browser.show(message, function(nid) {
         console.log('create nid', nid);
         message.timestamp = new Date().getTime();
-        return storage.set(nid, message);
+        return storage.save(nid, message);
       });
     };
 
@@ -178,6 +196,7 @@
     utils = window.BHFService.utils;
     storage = window.BHFService.storage;
     _website = window.BHFService.website;
+    messageList = window.BHFService.messageList;
     window.BHFService.notification = new Notification(new Factory());
   }
 

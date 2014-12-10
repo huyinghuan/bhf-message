@@ -3,14 +3,19 @@ class Account
   constructor: ()->
     @api = "#{baseURL}/api/session"
     @message = null
+    @messageList = messageList
     self = @
     @checkLogin(()->
       self.prepareMessage()
     )
 
   prepareMessage: (destory = false)->
-    return @message = new Message() if destory isnt true
-    @message = null
+    if destory isnt true
+      @message = new Message()
+      @messageList.refresh()
+    else
+      @message = null
+      @messageList.clear()
 
   getRemoteData: (setting)->
     type = setting.type or 'GET'
@@ -67,4 +72,5 @@ class Account
 if window.BHFService
   baseURL = window.BHFService.baseURL
   Message = window.BHFService.Message
+  messageList = window.BHFService.messageList
   window.BHFService.account = new Account()

@@ -11,7 +11,7 @@
       this.storage = chrome.storage.local;
     }
 
-    ChromeStorage.prototype.set = function(key, value) {
+    ChromeStorage.prototype.save = function(key, value) {
       var obj;
       obj = {};
       obj[key] = value;
@@ -69,8 +69,8 @@
       this.storage = factory.getStorage();
     }
 
-    Storage.prototype.set = function(key, value) {
-      return this.storage.set(key, value);
+    Storage.prototype.save = function(key, value) {
+      return this.storage.save(key, value);
     };
 
     Storage.prototype.get = function(key, cb) {

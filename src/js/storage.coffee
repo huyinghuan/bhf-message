@@ -5,7 +5,7 @@ class ChromeStorage
   constructor: ->
     @storage = chrome.storage.local
 
-  set: (key, value)->
+  save: (key, value)->
     obj = {}
     obj[key] = value
     @storage.set obj
@@ -37,8 +37,8 @@ class Storage
   constructor: (factory)->
     @storage = factory.getStorage()
 
-  set: (key, value)->
-    @storage.set key, value
+  save: (key, value)->
+    @storage.save key, value
 
   get: (key, cb)->
     @storage.get key, cb
