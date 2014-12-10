@@ -26,6 +26,7 @@ class HasUserTemplate
     @element =
       logout: $('#logout')
       messageList: $('#messageList')
+      hasReadAll: $('#hasReadAll')
 
   bindEvent: ->
     self = @
@@ -41,6 +42,11 @@ class HasUserTemplate
         $(this).parent('li').remove()
         $('.messageCount').html $('.messageCount').html() - 1
 
+    $ele.hasReadAll.on 'click', ->
+      self.message.setAllHasRead()
+      $ele.messageList.find('li').remove()
+      $('.messageCount').html 0
+
 class NoUserTemplate
   constructor: (@account)->
     @initTemplate()
@@ -49,8 +55,8 @@ class NoUserTemplate
 
   initTemplate: ->
     ele = $("#noUserPageTemplate")
-    source   = ele.html();
-    @template = Handlebars.compile(source);
+    source   = ele.html()
+    @template = Handlebars.compile(source)
     $('#content').html @template()
 
   initElement: ->
@@ -61,9 +67,15 @@ class NoUserTemplate
 
   bindEvent: ->
     $login = @element.login
+    $password = @element.password
     self = @
     $login.on 'click', ->
       self.login()
+
+    $password.on 'keyup', (e)->
+      if e.keyCode is 13
+        e.preventDefault()
+        self.login()
 
   login: ->
     self = @

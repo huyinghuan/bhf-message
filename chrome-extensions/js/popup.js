@@ -34,7 +34,8 @@
     HasUserTemplate.prototype.initElement = function() {
       return this.element = {
         logout: $('#logout'),
-        messageList: $('#messageList')
+        messageList: $('#messageList'),
+        hasReadAll: $('#hasReadAll')
       };
     };
 
@@ -47,7 +48,7 @@
           return new NoUserTemplate(self.account);
         });
       });
-      return $ele.messageList.find('a').on('click', function() {
+      $ele.messageList.find('a').on('click', function() {
         var id, url;
         url = $(this).data('url');
         id = $(this).data('id');
@@ -59,6 +60,11 @@
           $(this).parent('li').remove();
           return $('.messageCount').html($('.messageCount').html() - 1);
         }
+      });
+      return $ele.hasReadAll.on('click', function() {
+        self.message.setAllHasRead();
+        $ele.messageList.find('li').remove();
+        return $('.messageCount').html(0);
       });
     };
 
@@ -91,11 +97,18 @@
     };
 
     NoUserTemplate.prototype.bindEvent = function() {
-      var $login, self;
+      var $login, $password, self;
       $login = this.element.login;
+      $password = this.element.password;
       self = this;
-      return $login.on('click', function() {
+      $login.on('click', function() {
         return self.login();
+      });
+      return $password.on('keyup', function(e) {
+        if (e.keyCode === 13) {
+          e.preventDefault();
+          return self.login();
+        }
       });
     };
 

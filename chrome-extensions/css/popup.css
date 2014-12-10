@@ -1,15 +1,30 @@
+body{
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, hr, ul{
+    margin: 0;
+    padding: 0;
+}
+
 #content{
     font-size: 18px;
 }
 .popup-logo{
-  /*width: 36px;*/
-  /*height: 36px;*/
-  /*display: inline-block;*/
-  /*background-image: url("../assets/icon_36.png");*/
-  /*background-repeat: no-repeat;*/
+  width: 19px;
+  height: 19px;
+  display: inline-block;
+  background-image: url("../assets/icon_19.png");
+  background-repeat: no-repeat;
 }
 hr{
     color: #cccccc;
+}
+
+.popup-title{
+    padding: 10px;
+    color: #666666;
 }
 
 h1{
@@ -18,7 +33,7 @@ h1{
 }
 
 #noUserPage{
-    width: 380px;
+    width: 300px;
 }
 
 #hasUserPage{
@@ -38,7 +53,7 @@ h1{
     width: 100%;
 }
 .form-controller{
-    margin: 10px 15px 7px 15px;
+    margin: 15px 15px 7px 15px;
 }
 .form-input{
     display: block;
@@ -124,4 +139,48 @@ h1{
     color: #fff;
     background-color: #3071a9;
     border-color: #285e8e;
+}
+
+.messageTitle{
+    background-color: #e2e2e2;
+    padding: 10px;
+    color: #666;
+    text-align: left;
+    font-size: 12px;
+}
+
+.messageTitle a{
+    font-size: 10px;
+    float: right;
+}
+
+#messageList{
+    list-style: none;
+    font-size: 14px;
+}
+#messageList li{
+    padding: 10px;
+    color: #666;
+    text-align: left;
+    list-style: none;
+}
+
+#messageList li:hover{
+    background-color: #f4f2f2;
+}
+
+#messageList li a.read {
+    display: inline-block;
+    color: #f06000;
+    float: right;
+}
+#messageList li a.messageInfo{
+    color: #666;
+    text-align: left;
+    list-style: none;
+}
+
+.messageFooter{
+    float: right;
+    font-size: 14px;
 }
