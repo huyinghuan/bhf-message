@@ -6,7 +6,6 @@ class MessageList
     @api = "#{baseURL}/api/message"
 
   refresh: ->
-    console.log 111
     @get (items)-> storage.save 'newMessage', items
 
   getRemoteData: (setting)->

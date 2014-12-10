@@ -11,7 +11,6 @@
     }
 
     MessageList.prototype.refresh = function() {
-      console.log(111);
       return this.get(function(items) {
         return storage.save('newMessage', items);
       });

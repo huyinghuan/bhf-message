@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>bhf-message</title>
+  <meta charset="utf-8">
   <script src="js/lib/zepto.js"></script>
   <link href="css/popup.css" rel="stylesheet" type="text/css">
 </head>
@@ -46,7 +47,9 @@
       <ul id="messageList">
         {{#each messageList}}
         <li>
-          <a href="#" data-url="{{../baseURL}}{{link}}" class="messageInfo">{{content}}</a>
+          <p class="messageInfo">
+            <a href="#" data-url="{{../baseURL}}{{link}}" >{{content}}</a>
+          </p>
           <a href="#" data-id="{{id}}" class="read">已读</a>
         </li>
         {{/each}}
