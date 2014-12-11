@@ -8,19 +8,17 @@ class HasUserTemplate
     @message = messageList
     @initTemplate(data)
 
-
   initTemplate: (data)->
     data.baseURL = baseURL
     self = @
-    ele = $("#hasUserPageTemplate")
-    source   = $(ele).html()
-    template = Handlebars.compile(source)
-    @message.get((items)->
-      data.messageList = items
-      $('#content').html template(data)
-      self.initElement()
-      self.bindEvent()
-    )
+    mainTemplate = Handlebars.compile($("#hasUserPageTemplate").html())
+    @listTemplate = Handlebars.compile($("#messageListTemplate").html())
+    @emptyTemplate = Handlebars.compile($("#messageEmptyTempalte").html())
+    $('#content').html mainTemplate(data)
+    @initElement()
+    @setMessageListEmpty()
+    @initMessageList(data)
+    @bindEvent()
 
   initElement: ->
     @element =
@@ -28,28 +26,54 @@ class HasUserTemplate
       messageList: $('#messageList')
       hasReadAll: $('#hasReadAll')
       goToHome: $('#goHome')
+      messageCount: $('.messageCount')
+
+  initMessageList: (data)->
+    self = @
+    $ele = @element
+    @message.get((items)->
+      data.messageList = items
+      return if not items.length
+      $ele.messageList.html self.listTemplate data
+      self.bindMessageListClickEvents()
+      $ele.messageCount.html items.length
+    )
 
   bindEvent: ->
     self = @
     $ele = @element
     $ele.logout.on 'click', ->
       self.account.logout ()-> new NoUserTemplate(self.account)
+
+    $ele.hasReadAll.on 'click', ->
+      self.message.setAllHasRead()
+      self.clearMessageListHtml()
+
+    $ele.goToHome.on 'click', ->
+      window.open baseURL
+
+  bindMessageListClickEvents: ->
+    self = @
+    $ele = @element
     $ele.messageList.find('a').on 'click', ->
       url = $(this).data('url')
       id = $(this).data('id')
       window.open url if url
-      if id
-        self.message.setMessageAsRead(id)
-        $(this).parent('li').remove()
-        $('.messageCount').html $('.messageCount').html() - 1
+      self.message.setMessageAsRead(id)
+      $(this).parent('li').remove()
+      count = +$ele.messageCount.html()
+      $ele.messageCount.html(count - 1)
+      self.setMessageListEmpty() if count is 1
 
-    $ele.hasReadAll.on 'click', ->
-      self.message.setAllHasRead()
-      $ele.messageList.find('li').remove()
-      $('.messageCount').html 0
+  clearMessageListHtml: ->
+    $ele = @element
+    $ele.messageList.find('li').remove()
+    $ele.messageCount.html 0
+    @setMessageListEmpty()
 
-    $ele.goToHome.on 'click', ->
-      window.open baseURL
+  setMessageListEmpty: ->
+    $ele = @element.messageList.html @emptyTemplate()
+
 
 class NoUserTemplate
   constructor: (@account)->

@@ -43,7 +43,7 @@
 <script id="hasUserPageTemplate" type="text/x-handlebars-template">
   <div id="hasUserPage">
     <h3 class="messageTitle">
-      当前有<span class="messageCount">{{messageList.length}}</span>条消息未读
+      当前有<span class="messageCount">0</span>条消息未读
       <a href="#" id="goHome"><i class="fa fa-home fa-fw"></i> BHF主页</a>
       <a href="#" id="logout"><i class="fa fa-sign-out fa-fw"></i> 注销</a>
     </h3>
@@ -61,12 +61,27 @@
       <div class="messageFooter">
         <a href="#" id="hasReadAll">全部已读</a>
         <a href="#" id="viewAll">查看全部
-          <span class="messageCount">{{messageList.length}}</span>
-          条消息
+          <span class="messageCount">0</span>条消息
         </a>
       </div>
     </div>
   </div>
+</script>
+
+
+<script id="messageListTemplate" type="text/x-handlebars-template">
+  {{#each messageList}}
+    <li>
+    <p class="messageInfo">
+      <a href="#" data-url="{{../baseURL}}{{link}}" data-id="{{id}}">{{content}}</a>
+    </p>
+    <a href="#" data-id="{{id}}" class="read">已读</a>
+    </li>
+  {{/each}}
+</script>
+
+<script id="messageEmptyTempalte" type="text/x-handlebars-template">
+  <li style="text-align: center">暂无消息</li>
 </script>
 
 <div id="content">

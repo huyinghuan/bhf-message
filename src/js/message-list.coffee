@@ -5,8 +5,14 @@ class MessageList
   constructor: ->
     @api = "#{baseURL}/api/message"
 
-  refresh: ->
-    @get (items)-> storage.save 'newMessage', items
+  refresh: (delay = 0)->
+    self = @
+    setTimeout(
+      ()-> self.get (items)-> storage.save 'newMessage', items
+    , delay
+    )
+
+
 
   getRemoteData: (setting)->
     type = setting.type or 'GET'
@@ -48,7 +54,8 @@ class MessageList
     setting =
       data: id: id
       type: 'PUT'
-      success: ()-> self.refresh()
+      success: ()->
+        self.refresh()
 
     @getRemoteData(setting)
 

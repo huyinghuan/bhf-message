@@ -10,10 +10,17 @@
       this.api = "" + baseURL + "/api/message";
     }
 
-    MessageList.prototype.refresh = function() {
-      return this.get(function(items) {
-        return storage.save('newMessage', items);
-      });
+    MessageList.prototype.refresh = function(delay) {
+      var self;
+      if (delay == null) {
+        delay = 0;
+      }
+      self = this;
+      return setTimeout(function() {
+        return self.get(function(items) {
+          return storage.save('newMessage', items);
+        });
+      }, delay);
     };
 
     MessageList.prototype.getRemoteData = function(setting) {

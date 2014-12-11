@@ -17,18 +17,17 @@
     }
 
     HasUserTemplate.prototype.initTemplate = function(data) {
-      var ele, self, source, template;
+      var mainTemplate, self;
       data.baseURL = baseURL;
       self = this;
-      ele = $("#hasUserPageTemplate");
-      source = $(ele).html();
-      template = Handlebars.compile(source);
-      return this.message.get(function(items) {
-        data.messageList = items;
-        $('#content').html(template(data));
-        self.initElement();
-        return self.bindEvent();
-      });
+      mainTemplate = Handlebars.compile($("#hasUserPageTemplate").html());
+      this.listTemplate = Handlebars.compile($("#messageListTemplate").html());
+      this.emptyTemplate = Handlebars.compile($("#messageEmptyTempalte").html());
+      $('#content').html(mainTemplate(data));
+      this.initElement();
+      this.setMessageListEmpty();
+      this.initMessageList(data);
+      return this.bindEvent();
     };
 
     HasUserTemplate.prototype.initElement = function() {
@@ -36,8 +35,24 @@
         logout: $('#logout'),
         messageList: $('#messageList'),
         hasReadAll: $('#hasReadAll'),
-        goToHome: $('#goHome')
+        goToHome: $('#goHome'),
+        messageCount: $('.messageCount')
       };
+    };
+
+    HasUserTemplate.prototype.initMessageList = function(data) {
+      var $ele, self;
+      self = this;
+      $ele = this.element;
+      return this.message.get(function(items) {
+        data.messageList = items;
+        if (!items.length) {
+          return;
+        }
+        $ele.messageList.html(self.listTemplate(data));
+        self.bindMessageListClickEvents();
+        return $ele.messageCount.html(items.length);
+      });
     };
 
     HasUserTemplate.prototype.bindEvent = function() {
@@ -49,27 +64,47 @@
           return new NoUserTemplate(self.account);
         });
       });
-      $ele.messageList.find('a').on('click', function() {
-        var id, url;
+      $ele.hasReadAll.on('click', function() {
+        self.message.setAllHasRead();
+        return self.clearMessageListHtml();
+      });
+      return $ele.goToHome.on('click', function() {
+        return window.open(baseURL);
+      });
+    };
+
+    HasUserTemplate.prototype.bindMessageListClickEvents = function() {
+      var $ele, self;
+      self = this;
+      $ele = this.element;
+      return $ele.messageList.find('a').on('click', function() {
+        var count, id, url;
         url = $(this).data('url');
         id = $(this).data('id');
         if (url) {
           window.open(url);
         }
-        if (id) {
-          self.message.setMessageAsRead(id);
-          $(this).parent('li').remove();
-          return $('.messageCount').html($('.messageCount').html() - 1);
+        self.message.setMessageAsRead(id);
+        $(this).parent('li').remove();
+        count = +$ele.messageCount.html();
+        $ele.messageCount.html(count - 1);
+        if (count === 1) {
+          return self.setMessageListEmpty();
         }
       });
-      $ele.hasReadAll.on('click', function() {
-        self.message.setAllHasRead();
-        $ele.messageList.find('li').remove();
-        return $('.messageCount').html(0);
-      });
-      return $ele.goToHome.on('click', function() {
-        return window.open(baseURL);
-      });
+    };
+
+    HasUserTemplate.prototype.clearMessageListHtml = function() {
+      var $ele;
+      $ele = this.element;
+      $ele.messageList.find('li').remove();
+      $ele.messageCount.html(0);
+      return this.setMessageListEmpty();
+    };
+
+    HasUserTemplate.prototype.setMessageListEmpty = function() {
+      var $ele;
+      return $ele = this.element.messageList.html(this.emptyTemplate());
     };
 
     return HasUserTemplate;
